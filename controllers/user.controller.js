@@ -1,3 +1,4 @@
+import sendEmail from "../config/sendEmail";
 import UserModel from "../models/user.model";
 import bcryptjs from "bcryptjs";
 
@@ -34,6 +35,11 @@ export async function registerUserController(request, response) {
 
     const newUser = new UserModel(payload);
     const save = await newUser.save();
+
+    const verifyEmail = await sendEmail({
+      sendTo: email,
+      subject: "",
+    });
   } catch (error) {
     return response.status(500).json({
       message: error.message || error,
