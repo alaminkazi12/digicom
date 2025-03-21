@@ -6,6 +6,7 @@ import cookieParser from "cookie-parser";
 import helmet from "helmet";
 import morgan from "morgan";
 import connectDB from "./config/connectDB.js";
+import userRouter from "./route/user.route.js";
 
 const app = express();
 
@@ -32,6 +33,8 @@ app.get("/", (request, response) => {
     message: "Server is running",
   });
 });
+
+app.use("api/user", userRouter);
 
 connectDB().then(() => {
   app.listen(PORT, () => {

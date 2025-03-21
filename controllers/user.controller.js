@@ -1,7 +1,7 @@
-import sendEmail from "../config/sendEmail";
-import UserModel from "../models/user.model";
+import sendEmail from "../config/sendEmail.js";
+import UserModel from "../models/user.model.js";
 import bcryptjs from "bcryptjs";
-import verifyEmailTemplate from "../utils/verifyEmailTemplate";
+import verifyEmailTemplate from "../utils/verifyEmailTemplate.js";
 
 export async function registerUserController(request, response) {
   try {
@@ -13,16 +13,16 @@ export async function registerUserController(request, response) {
         error: true,
         success: false,
       });
+    }
 
-      const user = await UserModel.findOne({ email });
+    const user = await UserModel.findOne({ email });
 
-      if (user) {
-        return response.json({
-          message: "Already registered with this email",
-          error: true,
-          success: false,
-        });
-      }
+    if (user) {
+      return response.json({
+        message: "Already registered with this email",
+        error: true,
+        success: false,
+      });
     }
 
     const salt = await bcryptjs.genSalt(10);
@@ -37,12 +37,19 @@ export async function registerUserController(request, response) {
     const newUser = new UserModel(payload);
     const save = await newUser.save();
 
-    const verifyEmailUrl = `${process.env.FONTEND_URL}/verify-email`;
+    const verifyEmailUrl = `${process.env?.FONTEND_URL}/verify-email?code=${save?._id}`;
 
     const verifyEmail = await sendEmail({
       sendTo: email,
       subject: "Verify email form Digicom",
       html: verifyEmailTemplate({ name, verifyEmailUrl }),
+    });
+
+    return response.json({
+      message: "User register successfully",
+      error: false,
+      success: true,
+      data: save,
     });
   } catch (error) {
     return response.status(500).json({
