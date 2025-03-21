@@ -1,6 +1,7 @@
 import sendEmail from "../config/sendEmail";
 import UserModel from "../models/user.model";
 import bcryptjs from "bcryptjs";
+import verifyEmailTemplate from "../utils/verifyEmailTemplate";
 
 export async function registerUserController(request, response) {
   try {
@@ -36,9 +37,12 @@ export async function registerUserController(request, response) {
     const newUser = new UserModel(payload);
     const save = await newUser.save();
 
+    const verifyEmailUrl = `${process.env.FONTEND_URL}/verify-email`;
+
     const verifyEmail = await sendEmail({
       sendTo: email,
-      subject: "",
+      subject: "Verify email form Digicom",
+      html: verifyEmailTemplate({ name, verifyEmailUrl }),
     });
   } catch (error) {
     return response.status(500).json({
